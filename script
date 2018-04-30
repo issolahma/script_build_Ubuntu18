@@ -1,0 +1,114 @@
+#! /bin/bash
+
+#############
+# Variables #
+#############
+dir="$(dirname "$0")"
+CYAN="\\033[1;96m" #https://misc.flogisoft.com/bash/tip_colors_and_formatting
+PINK="\\038[5;198m"
+RED="\\033[1;31m"
+GREEN="\\038[5;82m"
+RESETCOLOR="\\033[0;0m"
+laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1) #Tableau associatif pour faciliter la recherche
+
+###################
+# Début du script #
+###################
+
+# Vérifie que le script est lancé par root
+if [ $(whoami) != 'root' ];then
+    echo -e  "Ce script a besoin des permissions adminisrtateur (sudo)"
+    exit 0
+fi
+
+
+# Vérifie la connexion internet en testant l'url des dépôts Ubuntu
+echo -en ${CYAN}" Contrôle de la connexion internet..."${RESETCOLOR}
+
+wget -q --spider http://ch.archive.ubuntu.com/ubuntu/dists/
+
+if [ $? -eq 0 ]; then
+    echo -e ${CYAN}"\e[0K\r Contrôle de la connexion internet"${GREEN}"    [OK]"${RESETCOLOR} # \e[0K\r = retour en début de ligne
+else
+    echo -e ${RED}"Veuillez vérifier votre connexion internet"${RESETCOLOR}
+    #read key
+    exit 0
+fi
+
+##########################################
+# Tronc commun pour tous les ordinateurs #
+##########################################
+echo -e ${PINK}"-- Tronc commun --"${RESETCOLOR}
+
+
+# Active Canonical ppa
+echo -e ${CYAN}"Activation du dépôt canonical..."${RESETCOLOR}
+sed -i -e '/# deb http:\/\/archive.canonical.com\/ubuntu\ /s/# //' /etc/apt/sources.list
+
+
+# Update
+echo -e ${CYAN}"Mise à jour du système..."${RESETCOLOR}
+apt update -y
+apt upgrade -y
+
+
+# Installation des applications favorites de la liste favs.list
+echo -e ${CYAN}"Installation des applications favorites..."${RESETCOLOR}
+FAVS="$dir/data/favs.list"
+apt install -y --no-install-recommends $(cat $FAVS)
+
+
+# Modification des application du dock
+echo -e ${CYAN}"Modification des application du dock..."${RESETCOLOR} 
+cp -r $dir/resources/99_launcher.favorites.gschema.override /usr/share/glib-2.0/schemas/99_launcher.favorites.gschema.override
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+# Installation du script Brother pour l'installation des pilotes d'impression
+echo -e ${CYAN}"Installation du script Brother..."${RESETCOLOR}
+cp $dir/resources/linux-brprinter-installer-2.2.0-1 /usr/local/bin/
+cp $dir/resources/BrotherInstall.desktop /usr/share/applications/
+chmod a+rx /usr/local/bin/linux-brprinter-installer-2.2.0-1
+
+# Create support shortcut on desktop
+#echo -e ${CYAN}"TODO shortcut desktop..."${RESETCOLOR}
+#lang="$(locale | grep LANGUAGE | cut -d= -f2 | cut -d_ -f1)"
+#mkdir -p /etc/skel/Desktop
+#cp $dir/resources/Support_$lang.desktop /etc/skel/Desktop/Support_$lang.desktop
+
+
+###################################################
+# Installations spécifiques aux différents laptop #
+###################################################
+echo -e ${CYAN}"-- Laptop --"${RESETCOLOR}
+
+# Recherche du modèle d'ordinateur
+computerModel=$(dmidecode | grep -i -m 1 product | cut -d : -f 2 | sed 's/ //g')
+echo -e ${CYAN}"Modèle: "$computerModel ${RESETCOLOR}
+
+if [[ ${laptopArray[$computerModel]} ]]; then
+    echo -e ${CYAN}"found: "$computerModel ${RESETCOLOR}
+else
+    echo -e ${CYAN} $computerModel" n'est pas un protable"${RESETCOLOR}
+    echo -e ${CYAN} "FIN"${RESETCOLOR}
+    exit 0
+fi
+
+# Installation d'acpi
+echo -e ${CYAN}"Installation d'acpi"${RESETCOLOR}
+apt install acpi -y
+
+if [[ $computerModel == "P7xxDM3" ]]; then
+    # Installation du pilote Nvidia
+    echo -e ${CYAN}"Installation du pilote Nvidia"${RESETCOLOR}
+    add-apt-repository -y ppa:graphics-drivers/ppa
+    apt update
+    apt install nvidia-384
+else
+    # Installation des pilotes tuxedo pour le mode avion
+    echo -e ${CYAN}"Installation des pilotes pour le mode avion"${RESETCOLOR}
+    apt install -y dkms
+    dpkg -i $dir/resources/tuxedo-wmi-dkms_1.5.1_all.deb
+
+    
+fi
+

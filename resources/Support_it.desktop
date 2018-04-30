@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Categories=GNOME;GTK;
+Exec=firefox http://blog.whyopencomputing.ch/it/support/
+Name=Support_itliano
+Comment=Pointe vers la page web Support du site why
+Icon=/usr/lib/firefox/browser/chrome/icons/default/default64.png
+Name[fr_CH]=Support_it

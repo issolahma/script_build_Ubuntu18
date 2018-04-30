@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=3
+Type=Application
+Terminal=true
+StartupNotify=true
+Icon=/usr/share/icons/oxygen/48x48/devices/printer.png
+Name=Brother Install
+Comment=Installation des drivers scanner et imprimante Brother
+Exec=/usr/local/bin/BrotherInstall
+Categories=Application
