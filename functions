@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function airplane {
+    # Installation des pilotes tuxedo pour le mode avion
+    echo -e ${CYAN}"Installation des pilotes pour le mode avion"${RESETCOLOR}
+    apt install -y dkms
+    dpkg -i $dir/resources/tuxedo-wmi-dkms_1.5.1_all.deb 
+}
+
+function nvidia {
+    # Installation du pilote Nvidia
+    echo -e ${CYAN}"Installation du pilote Nvidia"${RESETCOLOR}
+    add-apt-repository -y ppa:graphics-drivers/ppa
+    apt update
+    apt install nvidia-390
+}
+
+function tuxedoAirplane {
+    # Installation airplane driver Tuxedo pour la P775DM3
+    echo -e ${CYAN}"Installation du module Tuxedo"${RESETCOLOR}
+#TODO
+}
