@@ -1,10 +1,11 @@
 [Desktop Entry]
-Version=3
 Type=Application
 Terminal=true
 StartupNotify=true
-Icon=/usr/share/icons/oxygen/48x48/devices/printer.png
+Icon=printer.png
 Name=Brother Install
 Comment=Installation des drivers scanner et imprimante Brother
-Exec=/usr/local/bin/BrotherInstall
+Exec=sudo bash /usr/local/bin/linux-brprinter-installer-2.2.0-1
 Categories=Application
+Keywords=imprimante;printer;brother
+Name[fr_CH]=brother Install

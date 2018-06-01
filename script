@@ -24,13 +24,14 @@ fi
 
 
 # Vérifie la connexion internet en testant l'url des dépôts Ubuntu
-echo -en ${CYAN}" Contrôle de la connexion internet..."${RESETCOLOR}
+echo -en ${CYAN}"Contrôle de la connexion internet..."${RESETCOLOR}
 
 wget -q --spider http://ch.archive.ubuntu.com/ubuntu/dists/
 
 if [ $? -eq 0 ]; then
     echo -e ${CYAN}"\e[0K\r Contrôle de la connexion internet"${GREEN}"    [OK]"${RESETCOLOR} # \e[0K\r = retour en début de ligne
 else
+    echo -e ${CYAN}"\e[0K\r Contrôle de la connexion internet"${RED}"    [KO]"${RESETCOLOR}
     echo -e ${RED}"\nVeuillez vérifier votre connexion internet"${RESETCOLOR}
     #read key
     exit 0
@@ -67,7 +68,8 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 # Installation du script Brother pour l'installation des pilotes d'impression
 echo -e ${CYAN}"Installation du script Brother..."${RESETCOLOR}
 cp $dir/resources/linux-brprinter-installer-2.2.0-1 /usr/local/bin/
-cp $dir/resources/BrotherInstall.desktop /usr/share/applications/
+cp $dir/resources/brotherInstall.desktop /usr/share/applications/
+cp $dir/resources/printer.png /usr/share/applications/
 chmod a+rx /usr/local/bin/linux-brprinter-installer-2.2.0-1
 
 # Create support shortcut on desktop
@@ -86,7 +88,7 @@ echo -e ${PINK}"-- Laptop --"${RESETCOLOR}
 computerModel=$(dmidecode | grep -i -m 1 product | cut -d : -f 2 | sed 's/ //g' | sed 's/(//g' | sed 's/)//g')
 echo -e ${CYAN}"Modèle: "$computerModel ${RESETCOLOR}
 
-if [[ !${laptopArray[$computerModel]} ]]; then
+if [[ ! ${laptopArray[$computerModel]} ]]; then
     echo -e ${CYAN} $computerModel" n'est pas un protable"${RESETCOLOR}
     echo -e ${CYAN} "FINI"${RESETCOLOR}
     exit 0

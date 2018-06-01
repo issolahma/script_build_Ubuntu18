@@ -1,10 +1,8 @@
 #!/bin/bash
 
 function airplane {
-    # Installation des pilotes tuxedo pour le mode avion
-    echo -e ${CYAN}"Installation des pilotes pour le mode avion"${RESETCOLOR}
-    apt install -y dkms
-    dpkg -i $dir/resources/tuxedo-wmi-dkms_1.5.1_all.deb 
+    # Modification de grub pour le mode avion
+    sudo sed -i 's/splash/splash acpi_os_name=Linux acpi_osi= acpi_backlight=vendor/g' /etc/default/grub 
 }
 
 function nvidia {
