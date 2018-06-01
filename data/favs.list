@@ -15,5 +15,6 @@ sysinfo
 lm-sensors
 smartmontools
 openjdk-11-jre
-vlc
 ubuntu-restricted-extras
+ttf-mscorefonts-installer
+libdvdcss2

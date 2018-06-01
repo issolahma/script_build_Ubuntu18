@@ -1,9 +1,12 @@
 #! /bin/bash
 
 #############
+#           #
 # Variables #
+#           #
 #############
 dir="$(dirname "$0")"
+. functions # Inclusion du fichier functions
 CYAN="\\033[1;96m" #https://misc.flogisoft.com/bash/tip_colors_and_formatting
 PINK="\e[38;5;198m"
 RED="\\033[1;31m"
@@ -13,7 +16,9 @@ declare -A laptopArray
 laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1 [P7xxDM3-G]=1) #Tableau associatif pour faciliter la recherche
 
 ###################
+#                 #
 # Début du script #
+#                 #
 ###################
 
 # Vérifie que le script est lancé par root
@@ -29,16 +34,18 @@ echo -en ${CYAN}"Contrôle de la connexion internet..."${RESETCOLOR}
 wget -q --spider http://ch.archive.ubuntu.com/ubuntu/dists/
 
 if [ $? -eq 0 ]; then
-    echo -e ${CYAN}"\e[0K\r Contrôle de la connexion internet"${GREEN}"    [OK]"${RESETCOLOR} # \e[0K\r = retour en début de ligne
+    echo -e ${CYAN}"\e[0K\rContrôle de la connexion internet"${GREEN}"    [OK]"${RESETCOLOR} # \e[0K\r = retour en début de ligne
 else
-    echo -e ${CYAN}"\e[0K\r Contrôle de la connexion internet"${RED}"    [KO]"${RESETCOLOR}
-    echo -e ${RED}"\nVeuillez vérifier votre connexion internet"${RESETCOLOR}
+    echo -e ${CYAN}"\e[0K\rContrôle de la connexion internet"${RED}"    [KO]"${RESETCOLOR}
+    echo -e ${RED}"\n Veuillez vérifier votre connexion internet"${RESETCOLOR}
     #read key
     exit 0
 fi
 
 ##########################################
+#                                        #
 # Tronc commun pour tous les ordinateurs #
+#                                        #
 ##########################################
 echo -e ${PINK}"-- Tronc commun --"${RESETCOLOR}
 
@@ -47,10 +54,14 @@ echo -e ${PINK}"-- Tronc commun --"${RESETCOLOR}
 echo -e ${CYAN}"Activation du dépôt canonical..."${RESETCOLOR}
 sed -i -e '/# deb http:\/\/archive.canonical.com\/ubuntu\ /s/# //' /etc/apt/sources.list
 
+# Ajout du dépôt vlc pour avoir des mise à jour (le dépôt Ubuntu ne propose aucune maj vlc autre que celles de sécurités et bugs critiques)
+# ainsi que le plugin vlc nécessaire sur certains sites de live sport. Voir: https://doc.ubuntu-fr.org/vlc
+add-apt-repository ppa:videolan/stable-daily
+apt update -y
+apt install -y vlc browser-plugin-vlc
 
 # Update
 echo -e ${CYAN}"Mise à jour du système..."${RESETCOLOR}
-apt update -y
 apt upgrade -y
 
 
@@ -80,17 +91,20 @@ chmod a+rx /usr/local/bin/linux-brprinter-installer-2.2.0-1
 
 
 ###################################################
+#                                                 #
 # Installations spécifiques aux différents laptop #
+#                                                 #
 ###################################################
 echo -e ${PINK}"-- Laptop --"${RESETCOLOR}
 
 # Recherche du modèle d'ordinateur
 computerModel=$(dmidecode | grep -i -m 1 product | cut -d : -f 2 | sed 's/ //g' | sed 's/(//g' | sed 's/)//g')
-echo -e ${CYAN}"Modèle: "$computerModel ${RESETCOLOR}
+echo -e ${CYAN}"Modèle: "${GREEN}$computerModel ${RESETCOLOR}
 
 if [[ ! ${laptopArray[$computerModel]} ]]; then
     echo -e ${CYAN} $computerModel" n'est pas un protable"${RESETCOLOR}
     echo -e ${CYAN} "FINI"${RESETCOLOR}
+    languages
     exit 0
 fi
 
@@ -104,4 +118,6 @@ if [[ $computerModel == "P7xxDM3-G" ]]; then
 else
     airplane
 fi
+
+languages
 

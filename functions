@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function airplane {
-    # Modification de grub pour le mode avion
-    sudo sed -i 's/splash/splash acpi_os_name=Linux acpi_osi= acpi_backlight=vendor/g' /etc/default/grub 
+    # Modification de grub pour le mode avion (modification de toute la ligne qui commence par: GRUB_CMDLINE_LINUX_DEFAULT)
+    sed -i '/^GRUB_CMDLINE_LINUX_DEFAULT/c\GRUB_CMDLINE_LINUX_DEFAULT="quiet splash acpi_os_name=Linux acpi_osi= "' /etc/default/grub 
 }
 
 function nvidia {
@@ -17,4 +17,9 @@ function tuxedoAirplane {
     # Installation airplane driver Tuxedo pour la P775DM3
     echo -e ${CYAN}"Installation du module Tuxedo"${RESETCOLOR}
 #TODO
+}
+
+function languages {
+    # Message pour ne pas oublier de finir la configuration du système
+    echo -e ${PINK}"\n\n!! Ne pas oublier de mettre a jour la langue du système !!"${RESETCOLOR}
 }

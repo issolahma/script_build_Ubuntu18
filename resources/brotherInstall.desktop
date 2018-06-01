@@ -8,4 +8,4 @@ Comment=Installation des drivers scanner et imprimante Brother
 Exec=sudo bash /usr/local/bin/linux-brprinter-installer-2.2.0-1
 Categories=Application
 Keywords=imprimante;printer;brother
-Name[fr_CH]=brother Install
+Name[fr_CH]=brotherInstall
