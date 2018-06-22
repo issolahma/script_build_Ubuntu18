@@ -2,7 +2,9 @@
 
 function airplane {
     # Modification de grub pour le mode avion (modification de toute la ligne qui commence par: GRUB_CMDLINE_LINUX_DEFAULT)
+    echo -e ${CYAN}"Modification du grub pour le mode avion"${RESETCOLOR}
     sed -i '/^GRUB_CMDLINE_LINUX_DEFAULT/c\GRUB_CMDLINE_LINUX_DEFAULT="quiet splash acpi_os_name=Linux acpi_osi= "' /etc/default/grub 
+    update-grub
 }
 
 function nvidia {

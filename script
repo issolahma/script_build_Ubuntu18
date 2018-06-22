@@ -13,7 +13,7 @@ RED="\\033[1;31m"
 GREEN="\e[038;5;82m"
 RESETCOLOR="\\033[0;0m"
 declare -A laptopArray
-laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1 [P7xxDM3-G]=1) #Tableau associatif pour faciliter la recherche
+laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1 [P7xxDM3-G]=1 [N13xWU]=1) #Tableau associatif pour faciliter la recherche
 
 ###################
 #                 #
@@ -37,7 +37,7 @@ if [ $? -eq 0 ]; then
     echo -e ${CYAN}"\e[0K\rContrôle de la connexion internet"${GREEN}"    [OK]"${RESETCOLOR} # \e[0K\r = retour en début de ligne
 else
     echo -e ${CYAN}"\e[0K\rContrôle de la connexion internet"${RED}"    [KO]"${RESETCOLOR}
-    echo -e ${RED}"\n Veuillez vérifier votre connexion internet"${RESETCOLOR}
+    echo -e ${RED}"\nVeuillez vérifier votre connexion internet"${RESETCOLOR}
     #read key
     exit 0
 fi
@@ -54,14 +54,9 @@ echo -e ${PINK}"-- Tronc commun --"${RESETCOLOR}
 echo -e ${CYAN}"Activation du dépôt canonical..."${RESETCOLOR}
 sed -i -e '/# deb http:\/\/archive.canonical.com\/ubuntu\ /s/# //' /etc/apt/sources.list
 
-# Ajout du dépôt vlc pour avoir des mise à jour (le dépôt Ubuntu ne propose aucune maj vlc autre que celles de sécurités et bugs critiques)
-# ainsi que le plugin vlc nécessaire sur certains sites de live sport. Voir: https://doc.ubuntu-fr.org/vlc
-add-apt-repository ppa:videolan/stable-daily
-apt update -y
-apt install -y vlc browser-plugin-vlc
-
 # Update
 echo -e ${CYAN}"Mise à jour du système..."${RESETCOLOR}
+apt update
 apt upgrade -y
 
 
@@ -69,7 +64,8 @@ apt upgrade -y
 echo -e ${CYAN}"Installation des applications favorites..."${RESETCOLOR}
 FAVS="$dir/data/favs.list"
 apt install -y --no-install-recommends $(cat $FAVS)
-
+apt autoremove
+apt autoclean
 
 # Modification des application du dock
 echo -e ${CYAN}"Modification des application du dock..."${RESETCOLOR} 
@@ -82,6 +78,11 @@ cp $dir/resources/linux-brprinter-installer-2.2.0-1 /usr/local/bin/
 cp $dir/resources/brotherInstall.desktop /usr/share/applications/
 cp $dir/resources/printer.png /usr/share/applications/
 chmod a+rx /usr/local/bin/linux-brprinter-installer-2.2.0-1
+
+# Modification de grub pour ne pas afficher le menu
+echo -e ${CYAN}"Modification de grub (menu)..."${RESETCOLOR}
+sed -i '/^GRUB_TIMEOUT=/c\GRUB_TIMEOUT=0' /etc/default/grub
+update-grub
 
 # Create support shortcut on desktop
 #echo -e ${CYAN}"TODO shortcut desktop..."${RESETCOLOR}

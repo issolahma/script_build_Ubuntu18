@@ -10,6 +10,7 @@ scribus
 pavucontrol
 p7zip
 kigo
+vlc
 gparted
 sysinfo
 lm-sensors
@@ -18,3 +19,4 @@ openjdk-11-jre
 ubuntu-restricted-extras
 ttf-mscorefonts-installer
 libdvdcss2
+
