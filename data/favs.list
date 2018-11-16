@@ -17,6 +17,7 @@ lm-sensors
 smartmontools
 openjdk-11-jre
 ubuntu-restricted-extras
-ttf-mscorefonts-installer
 libdvdcss2
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
 

@@ -7,13 +7,17 @@
 #############
 dir="$(dirname "$0")"
 . functions # Inclusion du fichier functions
+
+# Couleur du code dans la console
 CYAN="\\033[1;96m" #https://misc.flogisoft.com/bash/tip_colors_and_formatting
 PINK="\e[38;5;198m"
 RED="\\033[1;31m"
 GREEN="\e[038;5;82m"
 RESETCOLOR="\\033[0;0m"
-declare -A laptopArray
-laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1 [P7xxDM3-G]=1 [N13xWU]=1) #Tableau associatif pour faciliter la recherche
+
+#Tableau associatif pour faciliter la recherche
+declare -A laptopArray 
+laptopArray=([N650DU]=1 [N2x0WU]=1 [N24_25BU]=1 [N24_25JU]=1 [P7xxDM3-G]=1 [N13xWU]=1 [W65_67SZ]=1 [W840AU]=1) # Ajouter un nouveau modèle en suivant le patern: [nomDuModele]=1
 
 ###################
 #                 #
@@ -67,6 +71,10 @@ apt install -y --no-install-recommends $(cat $FAVS)
 apt autoremove
 apt autoclean
 
+# installation fonts Microsoft avec paquet .deb car il y a souvent des erreur avec le paquet Ubuntu
+echo -e ${CYAN}"Installation des fonts Microsoft..."${RESETCOLOR}
+apt dpkg -i $dir/resources/ttf-mscorefonts-installer_3.7_all.deb
+
 # Modification des application du dock
 echo -e ${CYAN}"Modification des application du dock..."${RESETCOLOR} 
 cp -r $dir/resources/99_launcher.favorites.gschema.override /usr/share/glib-2.0/schemas/99_launcher.favorites.gschema.override
@@ -84,12 +92,6 @@ echo -e ${CYAN}"Modification de grub (menu)..."${RESETCOLOR}
 sed -i '/^GRUB_TIMEOUT=/c\GRUB_TIMEOUT=0' /etc/default/grub
 update-grub
 
-# Create support shortcut on desktop
-#echo -e ${CYAN}"TODO shortcut desktop..."${RESETCOLOR}
-#lang="$(locale | grep LANGUAGE | cut -d= -f2 | cut -d_ -f1)"
-#mkdir -p /etc/skel/Desktop
-#cp $dir/resources/Support_$lang.desktop /etc/skel/Desktop/Support_$lang.desktop
-
 
 ###################################################
 #                                                 #
@@ -102,8 +104,9 @@ echo -e ${PINK}"-- Laptop --"${RESETCOLOR}
 computerModel=$(dmidecode | grep -i -m 1 product | cut -d : -f 2 | sed 's/ //g' | sed 's/(//g' | sed 's/)//g')
 echo -e ${CYAN}"Modèle: "${GREEN}$computerModel ${RESETCOLOR}
 
+# Si le modèle n'est pas dans le tableau des laptop
 if [[ ! ${laptopArray[$computerModel]} ]]; then
-    echo -e ${CYAN} $computerModel" n'est pas un protable"${RESETCOLOR}
+    echo -e ${CYAN} $computerModel" n'est pas un portable"${RESETCOLOR}
     echo -e ${CYAN} "FINI"${RESETCOLOR}
     languages
     exit 0
@@ -114,11 +117,15 @@ echo -e ${CYAN}"Installation d'acpi"${RESETCOLOR}
 apt install acpi -y
 
 if [[ $computerModel == "P7xxDM3-G" ]]; then
+    # Installe le pilote Nvidia
     nvidia
-    tuxedoAirplane
+    # Driver clavier
+    tuxedoKeyboard
 else
+    # Mode avion
     airplane
 fi
 
+# Affiche un message pour ne pas oublier de mettre à jour la langue du système
 languages
 

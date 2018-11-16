@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function airplane {
-    # Modification de grub pour le mode avion (modification de toute la ligne qui commence par: GRUB_CMDLINE_LINUX_DEFAULT)
+    # Modification de grub pour le mode avion !!pas pour la P775DM3!! (modification de toute la ligne qui commence par: GRUB_CMDLINE_LINUX_DEFAULT)
     echo -e ${CYAN}"Modification du grub pour le mode avion"${RESETCOLOR}
     sed -i '/^GRUB_CMDLINE_LINUX_DEFAULT/c\GRUB_CMDLINE_LINUX_DEFAULT="quiet splash acpi_os_name=Linux acpi_osi= "' /etc/default/grub 
     update-grub
@@ -15,10 +15,22 @@ function nvidia {
     apt install nvidia-390
 }
 
-function tuxedoAirplane {
-    # Installation airplane driver Tuxedo pour la P775DM3
+function tuxedoKeyboard {
+    # Installation driver clavier Tuxedo pour la P775DM3
+    # https://github.com/tuxedocomputers/tuxedo-keyboard
     echo -e ${CYAN}"Installation du module Tuxedo"${RESETCOLOR}
-#TODO
+    apt install make gcc dkms git linux-headers-$(uname -r) -y
+    git clone https://github.com/tuxedocomputers/tuxedo-keyboard tuxedo-keyboard
+    cd tuxedo-keyboard
+    make clean && make
+    make clean
+    cp -R . /usr/src/tuxedo_keyboard-1
+    dkms add -m tuxedo_keyboard -v 1
+    dkms build -m tuxedo_keyboard -v 1
+    dkms install -m tuxedo_keyboard -v 1
+    modprobe tuxedo_keyboard
+    echo tuxedo_keyboard >> /etc/modules
+    echo "options tuxedo_keyboard mode=0 color_left=0xFF0000 color_center=0x00FF00 color_right=0x0000FF" > /etc/modprobe.d/tuxedo_keyboard.conf
 }
 
 function languages {
